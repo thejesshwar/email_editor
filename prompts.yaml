@@ -1,6 +1,106 @@
 shorten:
-  system:
-      You are a helpful assistant for an AI bootcamp.
-  user:
-      What is the weather in France?
-      {selected_text}
+  system: "Task: Condense text while preserving all factual details."
+  user: |
+    Condense the email below by removing filler and redundancy.
+    Preserve tone and all facts (dates, names, locations, actions).
+
+    EMAIL:
+    <<<
+    {selected_text}
+    >>>
+
+lengthen:
+  system: "Task: Expand text for clarity without adding new information."
+  user: |
+    Expand the email below by adding a brief opening and closing
+    and clarifying existing points.
+    Do not add new facts. Preserve tone.
+
+    EMAIL:
+    <<<
+    {selected_text}
+    >>>
+
+tone:
+  system: "Task: Adjust tone and formality without changing meaning."
+  user: |
+    Rewrite the email below to match a {tone} tone.
+    Preserve the original message.
+
+    EMAIL:
+    <<<
+    {selected_text}
+    >>>
+
+judge_faithfulness:
+  system: |
+    You evaluate FAITHFULNESS.
+    The generated text must contain only information supported by the original.
+
+    Penalize:
+    - Added facts, assumptions, or details not present
+    - Changes to meaning or intent
+    - Introduced context not explicitly stated
+
+    Ignore:
+    - Missing information
+    - Tone, politeness, or verbosity unless they add meaning
+  user: |
+    Compare the Original and Generated text for factual alignment.
+
+    Original:
+    {original_text}
+
+    Generated:
+    {generated_text}
+
+    OUTPUT:
+    Score: <1-5>
+    Reason: <Only unsupported or incorrect content>
+
+    SCORING:
+    5 – Fully faithful
+    4 – Minor unsupported additions
+    3 – Noticeable issues
+    2 – Major deviations
+    1 – Largely unfaithful
+judge_completeness:
+  system: |
+    You evaluate COMPLETENESS.
+    Every explicit fact, request, constraint, or intent in the original
+    must appear in the generated text.
+
+    Focus only on missing content.
+    Ignore extra text, tone changes, or factual errors.
+  user: |
+    Compare the Original and Generated text for content coverage.
+
+    Original:
+    {original_text}
+
+    Generated:
+    {generated_text}
+
+    OUTPUT:
+    Score: <1-5>
+    Reason: <List missing items or state none>
+
+    SCORING:
+    5 – Nothing missing
+    4 – One minor omission
+    3 – Multiple omissions
+    2 – Most content missing
+    1 – Largely incomplete
+generate_data:
+  system: "Task: Generate synthetic email data in JSON format."
+  user: |
+    Write a professional email on "{topic}" by "{persona}" in a "{tone}" tone.
+    Length: {length}.
+
+    Output a JSON object in the following format:
+    {
+      "id": {id_num},
+      "sender": "{persona}",
+      "subject": "<short subject>",
+      "content": "<email body>"
+    }
